@@ -49,7 +49,7 @@ public class ComunicacaoEsocialGov {
 	public boolean testarConexaoEsocial() {
 		boolean conexaoOk = true;
 		try {
-			RetornoProcessamento retornoProcessamento = consultarLoteEventos("0000");
+			RetornoProcessamento retornoProcessamento = consultarLoteEventos("1.2.202305.0000000000135638740");
 			String resposta = retornoProcessamento.getXmlRetorno();
 			if (resposta.indexOf("retornoProcessamentoLoteEventos") <= -1) {
 				LOGGER.debug("Ocorreu um erro ao tentar conectar com o eSocial. RetornoEnvio: {}", resposta);

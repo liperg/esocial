@@ -25,6 +25,7 @@ public class GeradorId {
 		}
 
 		return "ID1" + cnpj + date.format(formatter).replace("+", "") + seq;
+		//return "ID1337490860001092022021406303900001";
 	}
 
 }

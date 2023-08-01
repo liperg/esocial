@@ -118,4 +118,8 @@ public abstract class GeradorXml {
 	public abstract Object criarObjetoESocial(Evento evento) throws GeracaoXmlException;
 	
 	public abstract String getArquivoXSD();
+
+	public AssinadorXml getAssinadorXml() {
+		return assinadorXml;
+	}
 }

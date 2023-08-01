@@ -1,22 +1,35 @@
 package br.jus.tst.esocialjt.ocorrencia;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.supercsv.io.CsvBeanWriter;
+import org.supercsv.prefs.CsvPreference;
+
 import br.jus.tst.esocial.ocorrencia.OcorrenciaDTO;
+import br.jus.tst.esocial.ocorrencia.Operacao;
 import br.jus.tst.esocial.ocorrencia.TipoOcorrencia;
 import br.jus.tst.esocialjt.dominio.Estado;
 import br.jus.tst.esocialjt.dominio.Ocorrencia;
 import br.jus.tst.esocialjt.dominio.TipoEvento;
 import br.jus.tst.esocialjt.negocio.exception.EntidadeNaoExisteException;
 import io.swagger.v3.oas.annotations.Operation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-import org.supercsv.io.CsvBeanWriter;
-import org.supercsv.prefs.CsvPreference;
-
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/ocorrencias")
@@ -101,6 +114,51 @@ public class OcorrenciaResource {
 		return ocorrenciaServico.salvar(ocorrencia);
 	}
 	
+	@Operation(summary = "Url única para o recebimento de ocorrências. O tipo da ocorrência é passado no próprio json dos dados e deve obedecer "
+			+ "ao formato respectivo àquele tipo.")
+	@PostMapping(value = "/as/xml", consumes = "application/xml", produces = "application/json;charset=UTF-8")
+	public Ocorrencia receberAsXml(@RequestBody String xml) {
+		TipoOcorrencia tipoOcorrencia = tipoOcorrenciaFromXml(xml);
+		if(tipoOcorrencia == null)
+			throw new RuntimeException("Não foi possível determinar o tipo de ocorrência através do XML");
+		
+		OcorrenciaDTO dto = new OcorrenciaDTO();
+		dto.setDataOcorrencia(new Date());
+		dto.setOperacao(Operacao.NORMAL);
+		dto.setReferencia(UUID.randomUUID().toString());
+		dto.setTipoOcorrencia(tipoOcorrencia);
+		Ocorrencia ocorrencia = OcorrenciaMapper.INSTANCE.comoOcorrencia(dto);
+		ocorrencia.setTxtDadosOcorrenciaAsXml(xml);
+		
+		return ocorrenciaServico.salvarAsXml(ocorrencia);
+	}
+	
+	private TipoOcorrencia tipoOcorrenciaFromXml(String xml) {
+		Pattern pattern = Pattern.compile("(?<=\\/evt\\/)(.*)(?=\\/)");
+        Matcher matcher = pattern.matcher(xml);
+        if(!matcher.find())
+        	return null;
+        String evt = matcher.group().substring(3).toLowerCase();
+        if("infoempregador".equalsIgnoreCase(evt)) {
+        	return TipoOcorrencia.INFORMACOES_EMPREGADOR;
+        }
+        if("admissao".equalsIgnoreCase(evt)) {
+        	return TipoOcorrencia.ADMISSAO_TRABALHADOR;
+        }
+        if("remun".equalsIgnoreCase(evt)) {
+        	return TipoOcorrencia.REMUNERACAO_RGPS;
+        }
+        if("rmnrpps".equalsIgnoreCase(evt)) {
+        	return TipoOcorrencia.REMUNERACAO_RPPS;
+        }
+        if("pgtos".equalsIgnoreCase(evt)) {
+        	return TipoOcorrencia.PAGAMENTOS;
+        }
+        return Arrays.stream(TipoOcorrencia.values())
+        	.filter(v -> v.toString().toLowerCase().replace("_", "").equalsIgnoreCase(evt))
+        	.findFirst().orElse(null);
+	}
+
 	@Operation(summary ="Lista URLs com exemplos disponíveis para como uma ocorrência deve ser enviada para o /esocial-jt-service/ocorrencias.")
 	@GetMapping("/exemplos")
 	public List<String> getExemplo() {

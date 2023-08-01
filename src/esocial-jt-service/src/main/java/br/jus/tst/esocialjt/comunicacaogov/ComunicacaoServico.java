@@ -28,7 +28,7 @@ public class ComunicacaoServico extends WebServiceGatewaySupport {
 	
 	public String enviarLote(String lote) throws XmlMappingException, IOException {
 		String pacote = new GeradorLoteEventos().gerarLoteEventos(lote, getMarshaller());
-	
+		pacote = pacote.replace("<ideTransmissor><tpInsc>1</tpInsc><nrInsc>33749086</nrInsc></ideTransmissor>", "<ideTransmissor><tpInsc>1</tpInsc><nrInsc>33749086000109</nrInsc></ideTransmissor>");
 		StreamSource source = new StreamSource(new StringReader(pacote));
 		StreamResult result = new StringResult();
 		

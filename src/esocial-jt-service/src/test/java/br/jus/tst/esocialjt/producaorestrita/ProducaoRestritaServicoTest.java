@@ -25,7 +25,7 @@ import br.jus.tst.esocialjt.dominio.TipoEvento;
 @Transactional
 public class ProducaoRestritaServicoTest {
 
-	private final String CNPJ = "00509968000148";
+	private final String CNPJ = "33749086000109";
 	
 	@Autowired
 	private ProducaoRestritaServico producaoRestritaServico;

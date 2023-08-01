@@ -103,17 +103,23 @@ public class GeradorXmlFactory {
 
 	@Autowired
 	private GeradorXmlMonit geradorXmlMonit;
+	
+	@Autowired
+	private GeradorXmlNoOp geradorXmlNoOp;
 
 	private Map<TipoEvento, GeradorXml> geradores;
 
 	public GeradorXml getGerador(Evento evento) throws GeracaoXmlException {
+		if(evento.getOcorrencia().isXml()) {
+			return geradorXmlNoOp;
+		}
 		GeradorXml geradorXml = getGeradores().get(evento.getTipoEvento());
 		if (geradorXml == null) {
 			throw new GeracaoXmlException(evento, "Não foi possível encontrar um gerador de XML para o evento");
 		}
 		return geradorXml;
 	}
-
+	
 	private Map<TipoEvento, GeradorXml> getGeradores() {
 		if (geradores == null) {
 			geradores = new HashMap<>();
@@ -151,5 +157,7 @@ public class GeradorXmlFactory {
 		}
 		return geradores;
 	}
+	
+	
 
 }

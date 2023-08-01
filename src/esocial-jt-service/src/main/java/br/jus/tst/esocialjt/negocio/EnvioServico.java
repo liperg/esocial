@@ -6,6 +6,7 @@ import br.jus.tst.esocialjt.dominio.CodigoResposta;
 import br.jus.tst.esocialjt.dominio.EnvioEvento;
 import br.jus.tst.esocialjt.dominio.Evento;
 import br.jus.tst.esocialjt.dominio.Lote;
+import br.jus.tst.esocialjt.dominio.Ocorrencia;
 import br.jus.tst.esocialjt.negocio.exception.ComunicacaoEsocialGovException;
 import br.jus.tst.esocialjt.negocio.exception.GeracaoXmlException;
 import br.jus.tst.esocialjt.xml.GeradorLote;

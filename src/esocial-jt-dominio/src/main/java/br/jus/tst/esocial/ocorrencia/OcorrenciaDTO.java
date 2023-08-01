@@ -20,6 +20,8 @@ public class OcorrenciaDTO {
 	private Date dataOcorrencia;
 
 	private DadosOcorrencia dadosOcorrencia;
+	
+	private String xml;
 
 	public TipoOcorrencia getTipoOcorrencia() {
 		return tipoOcorrencia;
@@ -73,6 +75,14 @@ public class OcorrenciaDTO {
 	public OcorrenciaDTO setDataOcorrencia(Date dataOcorrencia) {
 		this.dataOcorrencia = dataOcorrencia;
 		return this;
+	}
+
+	public String getXml() {
+		return xml;
+	}
+
+	public void setXml(String xml) {
+		this.xml = xml;
 	}
 
 }

@@ -1,5 +1,6 @@
 package br.jus.tst.esocialjt.dominio;
 
+import br.jus.tst.esocial.dominio.empregador.IdeEmpregador;
 import br.jus.tst.esocial.ocorrencia.Operacao;
 import br.jus.tst.esocial.ocorrencia.TipoOcorrencia;
 import br.jus.tst.esocial.ocorrencia.dados.DadosOcorrencia;
@@ -14,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import javax.persistence.*;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Date;
 
 @SuppressWarnings("deprecation")
@@ -148,6 +150,47 @@ public class Ocorrencia implements Serializable {
 	}
 
 	public DadosOcorrencia getDadosOcorrencia() {
+		if(dadosOcorrencia == null) {
+			return new DadosOcorrencia() {
+				@Override
+				public IdeEmpregador getIdeEmpregador() {
+					IdeEmpregador ide = new IdeEmpregador();
+					ide.setTpInsc((byte) 1);
+					ide.setNrInsc("33749086");
+					return ide;
+				}
+				
+				@Override
+				public int hashCode() {
+					// TODO Auto-generated method stub
+					return 0;
+				}
+				
+				@Override
+				public String getMatricula() {
+					// TODO Auto-generated method stub
+					return null;
+				}
+				
+				@Override
+				public Calendar getDataEvento() {
+					// TODO Auto-generated method stub
+					return null;
+				}
+				
+				@Override
+				public String getCpf() {
+					// TODO Auto-generated method stub
+					return null;
+				}
+				
+				@Override
+				public boolean equals(Object obj) {
+					// TODO Auto-generated method stub
+					return false;
+				}
+			};
+		}
 		return dadosOcorrencia;
 	}
 
@@ -178,7 +221,7 @@ public class Ocorrencia implements Serializable {
 		return this;
 	}
 
-	protected String getTxtDadosOcorrencia() {
+	public String getTxtDadosOcorrencia() {
 		return txtDadosOcorrencia;
 	}
 
@@ -208,7 +251,8 @@ public class Ocorrencia implements Serializable {
 
 	protected Ocorrencia setTxtDadosOcorrencia(String txtDadosOcorrencia) {
 		this.txtDadosOcorrencia = txtDadosOcorrencia;
-
+		if(isXml()) return this;
+		
 		if (StringUtils.isNotBlank(txtDadosOcorrencia)) {
 			try {
 				dadosOcorrencia = new ObjectMapper().readValue(txtDadosOcorrencia, DadosOcorrencia.class);
@@ -221,5 +265,14 @@ public class Ocorrencia implements Serializable {
 
 		return this;
 	}
+	
 
+	public void setTxtDadosOcorrenciaAsXml(String txtDadosOcorrencia) {
+		this.txtDadosOcorrencia = txtDadosOcorrencia;
+	}
+
+
+	public boolean isXml() {
+		return txtDadosOcorrencia != null && txtDadosOcorrencia.startsWith("<");
+	}
 }

@@ -1,20 +1,24 @@
 package br.jus.tst.esocialjt.negocio;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import br.jus.tst.esocialjt.dominio.Estado;
 import br.jus.tst.esocialjt.dominio.Evento;
 import br.jus.tst.esocialjt.dominio.Ocorrencia;
 import br.jus.tst.esocialjt.dominio.TipoEvento;
 import br.jus.tst.esocialjt.xml.GeradorId;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 public class EventoServico {
@@ -34,7 +38,17 @@ public class EventoServico {
 		evento.setTipoEvento(tipoEvento);
 		evento.setOcorrencia(ocorrencia);
 		String cnpj = ocorrencia.getDadosOcorrencia().getIdeEmpregador().getNrInsc();
-		evento.setIdEvento(geradorId.gerarId(cnpj));
+		if(ocorrencia.isXml()) {
+			Pattern pattern = Pattern.compile("(?<=Id=\")(.*)(?=\")");
+	        Matcher matcher = pattern.matcher(ocorrencia.getTxtDadosOcorrencia());
+	        if(!matcher.find())
+	        	return null;
+	        String id = matcher.group();
+			evento.setIdEvento(id);	
+		} else {
+			evento.setIdEvento(geradorId.gerarId(cnpj));
+		}
+		
 		evento.setEstado(Estado.EM_FILA);
 
 		return evento;

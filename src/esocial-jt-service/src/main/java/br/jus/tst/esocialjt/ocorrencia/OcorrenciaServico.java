@@ -54,6 +54,13 @@ public class OcorrenciaServico {
 
 		return gerarEvento(ocorrencia);
 	}
+	
+	@Transactional
+	public Ocorrencia salvarAsXml(Ocorrencia ocorrencia) {
+		ocorrencia.setDataRecebimento(
+				new Date(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()));
+		return gerarEvento(ocorrencia);
+	}
 
 	public List<Ocorrencia> recuperaTodos() {
 		return repository.findAll();
